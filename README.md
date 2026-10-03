@@ -19,7 +19,7 @@ O PDV (Ponto de Vendas) é uma API REST desenvolvida em Spring Boot para gerenci
 * Bean Validation - Validação de dados
 ___
 ## Pré-requisitos
-* Java 21 instalado
+* Java 17 instalado
 * Maven instalado (ou use o wrapper do projeto)
 
 ## Banco de Dados
