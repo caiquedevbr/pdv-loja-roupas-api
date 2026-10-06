@@ -16,7 +16,8 @@ public class SwaggerConfig {
         return new OpenAPI().info(new Info()
                 .title("Ponto de Vendas (PDV) API")
                 .version("1.0.0")
-                .description("API to ")
+                .description("API REST para gerenciamento de um Ponto de Vendas (PDV) de loja de roupas. " +
+                "Permite cadastrar clientes, categorias, produtos, controlar estoque e registrar vendas.")
                 .termsOfService("https://swagger.io/terms/")
                 .license(new License().name("MIT").url("https://mit-license.org/"))
                 .contact(new Contact().name("José Caique")

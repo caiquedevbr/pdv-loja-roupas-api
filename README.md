@@ -1,13 +1,14 @@
 # Ponto de Vendas (PDV) API em Spring Boot
 
-O PDV (Ponto de Vendas) é uma API REST desenvolvida em Spring Boot para gerenciamento de vendas, produtos e usuários. O sistema permite realizar vendas, controlar estoque de produtos e gerenciar usuários do sistema.
+O PDV (Ponto de Vendas) é uma API REST desenvolvida em Spring Boot para gerenciamento de uma loja
+de roupas. O sistema permite cadastrar clientes, organizar produtos por categorias, controlar o
+estoque e registrar vendas com múltiplos produtos.
 
 ## Funcionalidades
 
 * Gestão de Produtos: Cadastro, consulta, atualização e controle de estoque
 * Gestão de Vendas: Criação de vendas com múltiplos itens
-* Gestão de Usuários: Cadastro e controle de usuários do sistema
-* Controle de Estoque: Atualização automática do estoque ao realizar vendas
+* Controle de Estoque: Registrar vendas com múltiplos produtos
 
 ---
 
