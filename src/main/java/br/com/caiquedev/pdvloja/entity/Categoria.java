@@ -1,19 +1,22 @@
 package br.com.caiquedev.pdvloja.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nome;
-    private String descricao;
 
-    // Getters e Setters
+    @NotBlank
+    @Size(min = 3, max = 100)
+    @Column(unique = true)
+    private String nome;
+
+    @NotBlank
+    private String descricao;
 
     public Long getId(){
         return id;

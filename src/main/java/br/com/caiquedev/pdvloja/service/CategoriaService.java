@@ -1,10 +1,11 @@
 package br.com.caiquedev.pdvloja.service;
 
 import br.com.caiquedev.pdvloja.entity.Categoria;
+import br.com.caiquedev.pdvloja.exception.CategoriaNotFoundException;
 import br.com.caiquedev.pdvloja.repository.CategoriaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CategoriaService {
@@ -19,31 +20,29 @@ public class CategoriaService {
         return categoriaRepository.save(categoria);
     }
 
-    public Categoria atualizar(Long id, Categoria categoria) {
-        Categoria existente = categoriaRepository.findById(id)
-                .orElseThrow();
-
-        existente.setNome(categoria.getNome());
-        existente.setDescricao(categoria.getDescricao());
-
-        return categoriaRepository.save(existente);
-    }
-
-    public Categoria deletar(Long id) {
-        Categoria existente = categoriaRepository.findById(id)
-                .orElseThrow();
-
-        categoriaRepository.delete(existente);
-
-        return existente;
+    public Page<Categoria> listarTodos(Pageable pageable) {
+        return categoriaRepository.findAll(pageable);
     }
 
     public Categoria listarPorId(Long id) {
         return categoriaRepository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new CategoriaNotFoundException(id));
     }
 
-    public List<Categoria> listarTodos() {
-        return categoriaRepository.findAll();
+    public Page<Categoria> listarPorNome(String nome, Pageable pageable) {
+        return categoriaRepository.findByNomeContainingIgnoreCase(nome, pageable);
+    }
+
+    public Categoria atualizar(Long id, Categoria categoria) {
+        Categoria existente = categoriaRepository.findById(id)
+                .orElseThrow(() -> new CategoriaNotFoundException(id));
+        existente.setNome(categoria.getNome());
+        existente.setDescricao(categoria.getDescricao());
+        return categoriaRepository.save(existente);
+    }
+
+    public void deletar(Long id) {
+        categoriaRepository.findById(id).orElseThrow(() -> new CategoriaNotFoundException(id));
+        categoriaRepository.deleteById(id);
     }
 }
