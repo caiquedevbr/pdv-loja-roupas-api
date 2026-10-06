@@ -30,7 +30,7 @@ public class EstoqueService {
     }
 
     public Page<Estoque> listarEstoqueBaixo(Pageable pageable) {
-        return estoqueRepository.findByQuantidadeLessThanEqualEstoqueMinimo(pageable);
+        return estoqueRepository.findEstoqueAbaixoDoMinimo(pageable);
     }
 
     public Estoque atualizar(Long id, Estoque estoque) {
