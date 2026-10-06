@@ -1,6 +1,7 @@
 package br.com.caiquedev.pdvloja.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import org.springframework.context.annotation.Bean;
@@ -12,8 +13,15 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI customAPI(){
-        return new OpenAPI().info(new Info().title("Sistema PDV").version("1.0.0")
-                .license(new License().name("MIT License").url("https://opensource.org/licenses/MIT"))
+        return new OpenAPI().info(new Info()
+                .title("Ponto de Vendas (PDV) API")
+                .version("1.0.0")
+                .description("API to ")
+                .termsOfService("https://swagger.io/terms/")
+                .license(new License().name("MIT").url("https://mit-license.org/"))
+                .contact(new Contact().name("José Caique")
+                .url("https://github.com/caiquedevbr")
+                .email("jcaique825@gmail.com"))
 
         );
     }
