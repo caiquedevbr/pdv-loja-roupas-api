@@ -18,6 +18,7 @@ public class ClienteService {
     }
 
     public Cliente salvar(Cliente cliente) {
+        cliente.setId(null);
         return clienteRepository.save(cliente);
     }
 

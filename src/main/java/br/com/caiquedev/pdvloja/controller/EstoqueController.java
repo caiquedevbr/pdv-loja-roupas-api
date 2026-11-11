@@ -51,6 +51,14 @@ public class EstoqueController {
         return assembler.toModel(estoqueService.listarPorId(id));
     }
 
+    @Operation(summary = "Buscar estoque por produto", description = "Retorna o único registro de estoque associado ao produto informado.")
+    @ApiResponse(responseCode = "200", description = "Estoque encontrado")
+    @ApiResponse(responseCode = "404", description = "Produto sem estoque cadastrado")
+    @GetMapping("/produto/{produtoId}")
+    public EntityModel<Estoque> listarPorProduto(@PathVariable Long produtoId) {
+        return assembler.toModel(estoqueService.listarPorProduto(produtoId));
+    }
+
     @Operation(summary = "Listar estoques com quantidade baixa")
     @ApiResponse(responseCode = "200", description = "Lista paginada de estoques baixos retornada com sucesso")
     @GetMapping("/baixo")
@@ -60,18 +68,22 @@ public class EstoqueController {
         return ResponseEntity.ok(pagedResourcesAssembler.toModel(page, assembler));
     }
 
-    @Operation(summary = "Cadastrar novo estoque")
+    @Operation(summary = "Cadastrar novo estoque", description = "Cria o único registro de estoque para um produto existente.")
     @ApiResponse(responseCode = "201", description = "Estoque criado com sucesso")
     @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "404", description = "Produto não encontrado")
+    @ApiResponse(responseCode = "409", description = "Produto já possui estoque cadastrado")
     @PostMapping
     public ResponseEntity<EntityModel<Estoque>> salvar(@RequestBody @Valid Estoque estoque) {
         EntityModel<Estoque> model = assembler.toModel(estoqueService.salvar(estoque));
         return ResponseEntity.created(model.getRequiredLink("self").toUri()).body(model);
     }
 
-    @Operation(summary = "Atualizar estoque")
+    @Operation(summary = "Atualizar estoque", description = "Atualiza quantidade, mínimo e produto do registro de estoque.")
     @ApiResponse(responseCode = "200", description = "Estoque atualizado com sucesso")
     @ApiResponse(responseCode = "404", description = "Estoque não encontrado")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "409", description = "Produto já possui estoque cadastrado")
     @PutMapping("/{id}")
     public EntityModel<Estoque> atualizar(@PathVariable Long id, @RequestBody @Valid Estoque estoque) {
         return assembler.toModel(estoqueService.atualizar(id, estoque));
