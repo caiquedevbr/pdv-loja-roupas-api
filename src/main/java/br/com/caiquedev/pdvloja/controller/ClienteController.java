@@ -59,18 +59,21 @@ public class ClienteController {
         return assembler.toModel(clienteService.listarPorCpf(cpf));
     }
 
-    @Operation(summary = "Cadastrar novo cliente")
+    @Operation(summary = "Cadastrar novo cliente", description = "Cria um cliente com CPF único, telefone e dados obrigatórios válidos.")
     @ApiResponse(responseCode = "201", description = "Cliente criado com sucesso")
     @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "409", description = "CPF já cadastrado")
     @PostMapping
     public ResponseEntity<EntityModel<Cliente>> salvar(@RequestBody @Valid Cliente cliente) {
         EntityModel<Cliente> model = assembler.toModel(clienteService.salvar(cliente));
         return ResponseEntity.created(model.getRequiredLink("self").toUri()).body(model);
     }
 
-    @Operation(summary = "Atualizar cliente")
+    @Operation(summary = "Atualizar cliente", description = "Substitui os dados do cliente identificado pelo ID.")
     @ApiResponse(responseCode = "200", description = "Cliente atualizado com sucesso")
     @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "409", description = "CPF já cadastrado")
     @PutMapping("/{id}")
     public EntityModel<Cliente> atualizar(@PathVariable Long id, @RequestBody @Valid Cliente cliente) {
         return assembler.toModel(clienteService.atualizar(id, cliente));
@@ -79,6 +82,7 @@ public class ClienteController {
     @Operation(summary = "Excluir cliente")
     @ApiResponse(responseCode = "204", description = "Cliente excluído com sucesso")
     @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+    @ApiResponse(responseCode = "409", description = "Cliente possui vendas vinculadas")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         clienteService.deletar(id);

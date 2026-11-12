@@ -17,6 +17,7 @@ public class CategoriaService {
     }
 
     public Categoria salvar(Categoria categoria) {
+        categoria.setId(null);
         return categoriaRepository.save(categoria);
     }
 

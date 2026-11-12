@@ -61,18 +61,21 @@ public class CategoriaController {
         return ResponseEntity.ok(pagedResourcesAssembler.toModel(page, assembler));
     }
 
-    @Operation(summary = "Cadastrar nova categoria")
+    @Operation(summary = "Cadastrar nova categoria", description = "Cria uma categoria única para classificação de produtos.")
     @ApiResponse(responseCode = "201", description = "Categoria criada com sucesso")
     @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "409", description = "Nome de categoria já cadastrado")
     @PostMapping
     public ResponseEntity<EntityModel<Categoria>> salvar(@RequestBody @Valid Categoria categoria) {
         EntityModel<Categoria> model = assembler.toModel(categoriaService.salvar(categoria));
         return ResponseEntity.created(model.getRequiredLink("self").toUri()).body(model);
     }
 
-    @Operation(summary = "Atualizar categoria")
+    @Operation(summary = "Atualizar categoria", description = "Substitui os dados da categoria identificada pelo ID.")
     @ApiResponse(responseCode = "200", description = "Categoria atualizada com sucesso")
     @ApiResponse(responseCode = "404", description = "Categoria não encontrada")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "409", description = "Nome de categoria já cadastrado")
     @PutMapping("/{id}")
     public EntityModel<Categoria> atualizar(@PathVariable Long id, @RequestBody @Valid Categoria categoria) {
         return assembler.toModel(categoriaService.atualizar(id, categoria));
@@ -81,6 +84,7 @@ public class CategoriaController {
     @Operation(summary = "Excluir categoria")
     @ApiResponse(responseCode = "204", description = "Categoria excluída com sucesso")
     @ApiResponse(responseCode = "404", description = "Categoria não encontrada")
+    @ApiResponse(responseCode = "409", description = "Categoria possui produtos vinculados")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         categoriaService.deletar(id);

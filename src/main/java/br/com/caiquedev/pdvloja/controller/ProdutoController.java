@@ -60,18 +60,20 @@ public class ProdutoController {
         return ResponseEntity.ok(pagedResourcesAssembler.toModel(page, assembler));
     }
 
-    @Operation(summary = "Cadastrar novo produto")
+    @Operation(summary = "Cadastrar novo produto", description = "Cria um produto associado a uma categoria existente.")
     @ApiResponse(responseCode = "201", description = "Produto criado com sucesso")
     @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "404", description = "Categoria não encontrada")
     @PostMapping
     public ResponseEntity<EntityModel<Produto>> salvar(@RequestBody @Valid Produto produto) {
         EntityModel<Produto> model = assembler.toModel(produtoService.salvar(produto));
         return ResponseEntity.created(model.getRequiredLink("self").toUri()).body(model);
     }
 
-    @Operation(summary = "Atualizar produto")
+    @Operation(summary = "Atualizar produto", description = "Substitui os dados do produto identificado pelo ID.")
     @ApiResponse(responseCode = "200", description = "Produto atualizado com sucesso")
     @ApiResponse(responseCode = "404", description = "Produto não encontrado")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
     @PutMapping("/{id}")
     public EntityModel<Produto> atualizar(@PathVariable Long id, @RequestBody @Valid Produto produto) {
         return assembler.toModel(produtoService.atualizar(id, produto));
@@ -80,6 +82,7 @@ public class ProdutoController {
     @Operation(summary = "Excluir produto")
     @ApiResponse(responseCode = "204", description = "Produto excluído com sucesso")
     @ApiResponse(responseCode = "404", description = "Produto não encontrado")
+    @ApiResponse(responseCode = "409", description = "Produto possui estoque ou vendas vinculados")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         produtoService.deletar(id);

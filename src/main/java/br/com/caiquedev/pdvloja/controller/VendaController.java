@@ -61,18 +61,22 @@ public class VendaController {
         return ResponseEntity.ok(pagedResourcesAssembler.toModel(page, assembler));
     }
 
-    @Operation(summary = "Cadastrar nova venda")
+    @Operation(summary = "Cadastrar nova venda", description = "Registra uma venda para um cliente existente, calcula o total pelos preços atuais e baixa uma unidade de cada produto.")
     @ApiResponse(responseCode = "201", description = "Venda criada com sucesso")
     @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "404", description = "Cliente ou produto não encontrado")
+    @ApiResponse(responseCode = "409", description = "Estoque inexistente ou insuficiente")
     @PostMapping
     public ResponseEntity<EntityModel<Venda>> salvar(@RequestBody @Valid Venda venda) {
         EntityModel<Venda> model = assembler.toModel(vendaService.salvar(venda));
         return ResponseEntity.created(model.getRequiredLink("self").toUri()).body(model);
     }
 
-    @Operation(summary = "Atualizar venda")
+    @Operation(summary = "Atualizar venda", description = "Atualiza cliente, forma de pagamento e produtos; o saldo anterior é devolvido antes da nova baixa.")
     @ApiResponse(responseCode = "200", description = "Venda atualizada com sucesso")
     @ApiResponse(responseCode = "404", description = "Venda não encontrada")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "409", description = "Estoque inexistente ou insuficiente")
     @PutMapping("/{id}")
     public EntityModel<Venda> atualizar(@PathVariable Long id, @RequestBody @Valid Venda venda) {
         return assembler.toModel(vendaService.atualizar(id, venda));
@@ -81,6 +85,7 @@ public class VendaController {
     @Operation(summary = "Excluir venda")
     @ApiResponse(responseCode = "204", description = "Venda excluída com sucesso")
     @ApiResponse(responseCode = "404", description = "Venda não encontrada")
+    @ApiResponse(responseCode = "409", description = "Não foi possível estornar o estoque da venda")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         vendaService.deletar(id);

@@ -1,5 +1,6 @@
 package br.com.caiquedev.pdvloja.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
@@ -9,26 +10,36 @@ public class Produto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY, example = "1")
     private Long id;
 
     @NotBlank
     @Size(min = 3, max = 100)
+    @Schema(example = "Camiseta básica")
     private String nome;
 
     @NotBlank
+    @Size(max = 500)
+    @Column(nullable = false, length = 500)
+    @Schema(example = "Camiseta de algodão preta")
     private String descricao;
 
     @NotNull
-    @DecimalMin("0.0")
+    @DecimalMin(value = "0.01")
+    @Digits(integer = 10, fraction = 2)
+    @Column(nullable = false, precision = 12, scale = 2)
+    @Schema(description = "Preço unitário positivo", example = "79.90")
     private BigDecimal preco;
 
     @NotNull
     @Enumerated(EnumType.STRING)
+    @Schema(example = "M")
     private Tamanho tamanho;
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "categoria_id")
+    @JoinColumn(name = "categoria_id", nullable = false)
+    @Schema(description = "Informe ao menos o id de uma categoria existente", example = "{\"id\": 1}")
     private Categoria categoria;
 
     public enum Tamanho { PP, P, M, G, GG }
