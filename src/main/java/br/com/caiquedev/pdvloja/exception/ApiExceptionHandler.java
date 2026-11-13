@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.net.URI;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -40,7 +43,7 @@ public class ApiExceptionHandler {
 
         ProblemDetail problem = problem(HttpStatus.BAD_REQUEST, "Dados inválidos",
                 "Corrija os campos informados e envie a requisição novamente.");
-        problem.setProperty("campos", invalidFields);
+        problem.setProperty("detalhes", invalidFields);
         return ResponseEntity.badRequest().body(problem);
     }
 
@@ -57,6 +60,9 @@ public class ApiExceptionHandler {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(status, detail);
         problem.setTitle(title);
         problem.setType(URI.create("https://api.pdv-loja.local/errors/" + status.value()));
+        problem.setProperty("mensagem", detail);
+        problem.setProperty("timestamp", OffsetDateTime.now(ZoneOffset.UTC).toString());
+        problem.setProperty("detalhes", Collections.emptyMap());
         return problem;
     }
 }
