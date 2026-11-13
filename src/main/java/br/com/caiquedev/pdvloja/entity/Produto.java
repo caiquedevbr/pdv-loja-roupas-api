@@ -6,6 +6,7 @@ import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
 @Entity
+@Schema(name = "Produto", description = "Dados de um produto comercializado pela loja")
 public class Produto {
 
     @Id

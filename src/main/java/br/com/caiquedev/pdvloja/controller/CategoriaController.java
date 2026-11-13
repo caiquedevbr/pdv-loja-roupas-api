@@ -4,6 +4,7 @@ import br.com.caiquedev.pdvloja.assembler.CategoriaModelAssembler;
 import br.com.caiquedev.pdvloja.entity.Categoria;
 import br.com.caiquedev.pdvloja.service.CategoriaService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -47,7 +48,7 @@ public class CategoriaController {
     @ApiResponse(responseCode = "200", description = "Categoria encontrada")
     @ApiResponse(responseCode = "404", description = "Categoria não encontrada")
     @GetMapping("/{id}")
-    public EntityModel<Categoria> listarPorId(@PathVariable Long id) {
+    public EntityModel<Categoria> listarPorId(@Parameter(description = "Identificador da categoria") @PathVariable Long id) {
         return assembler.toModel(categoriaService.listarPorId(id));
     }
 
@@ -55,7 +56,7 @@ public class CategoriaController {
     @ApiResponse(responseCode = "200", description = "Lista paginada de categorias retornada com sucesso")
     @GetMapping("/busca")
     public ResponseEntity<PagedModel<EntityModel<Categoria>>> listarPorNome(
-            @RequestParam String nome,
+            @Parameter(description = "Trecho do nome da categoria para busca", required = true) @RequestParam String nome,
             @ParameterObject @PageableDefault(size = 10, page = 0) Pageable pageable) {
         Page<Categoria> page = categoriaService.listarPorNome(nome, pageable);
         return ResponseEntity.ok(pagedResourcesAssembler.toModel(page, assembler));
@@ -77,7 +78,7 @@ public class CategoriaController {
     @ApiResponse(responseCode = "400", description = "Dados inválidos")
     @ApiResponse(responseCode = "409", description = "Nome de categoria já cadastrado")
     @PutMapping("/{id}")
-    public EntityModel<Categoria> atualizar(@PathVariable Long id, @RequestBody @Valid Categoria categoria) {
+    public EntityModel<Categoria> atualizar(@Parameter(description = "Identificador da categoria") @PathVariable Long id, @RequestBody @Valid Categoria categoria) {
         return assembler.toModel(categoriaService.atualizar(id, categoria));
     }
 
@@ -86,7 +87,7 @@ public class CategoriaController {
     @ApiResponse(responseCode = "404", description = "Categoria não encontrada")
     @ApiResponse(responseCode = "409", description = "Categoria possui produtos vinculados")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+    public ResponseEntity<Void> deletar(@Parameter(description = "Identificador da categoria") @PathVariable Long id) {
         categoriaService.deletar(id);
         return ResponseEntity.noContent().build();
     }

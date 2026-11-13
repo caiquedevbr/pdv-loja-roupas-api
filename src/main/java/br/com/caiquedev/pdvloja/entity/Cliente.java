@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @Entity
+@Schema(name = "Cliente", description = "Dados de identificacao e contato de um cliente")
 public class Cliente {
 
     @Id

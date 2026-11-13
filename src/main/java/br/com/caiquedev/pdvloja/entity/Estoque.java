@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 @Entity
+@Schema(name = "Estoque", description = "Saldo e nivel minimo de estoque de um produto")
 public class Estoque {
 
     @Id
