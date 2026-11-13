@@ -4,6 +4,7 @@ import br.com.caiquedev.pdvloja.assembler.VendaModelAssembler;
 import br.com.caiquedev.pdvloja.entity.Venda;
 import br.com.caiquedev.pdvloja.service.VendaService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -47,7 +48,7 @@ public class VendaController {
     @ApiResponse(responseCode = "200", description = "Venda encontrada")
     @ApiResponse(responseCode = "404", description = "Venda não encontrada")
     @GetMapping("/{id}")
-    public EntityModel<Venda> listarPorId(@PathVariable Long id) {
+    public EntityModel<Venda> listarPorId(@Parameter(description = "Identificador da venda") @PathVariable Long id) {
         return assembler.toModel(vendaService.listarPorId(id));
     }
 
@@ -55,7 +56,7 @@ public class VendaController {
     @ApiResponse(responseCode = "200", description = "Lista paginada de vendas retornada com sucesso")
     @GetMapping("/cliente/{clienteId}")
     public ResponseEntity<PagedModel<EntityModel<Venda>>> listarPorCliente(
-            @PathVariable Long clienteId,
+            @Parameter(description = "Identificador do cliente") @PathVariable Long clienteId,
             @ParameterObject @PageableDefault(size = 10, page = 0, sort = "dataVenda") Pageable pageable) {
         Page<Venda> page = vendaService.listarPorCliente(clienteId, pageable);
         return ResponseEntity.ok(pagedResourcesAssembler.toModel(page, assembler));
@@ -78,7 +79,7 @@ public class VendaController {
     @ApiResponse(responseCode = "400", description = "Dados inválidos")
     @ApiResponse(responseCode = "409", description = "Estoque inexistente ou insuficiente")
     @PutMapping("/{id}")
-    public EntityModel<Venda> atualizar(@PathVariable Long id, @RequestBody @Valid Venda venda) {
+    public EntityModel<Venda> atualizar(@Parameter(description = "Identificador da venda") @PathVariable Long id, @RequestBody @Valid Venda venda) {
         return assembler.toModel(vendaService.atualizar(id, venda));
     }
 
@@ -87,7 +88,7 @@ public class VendaController {
     @ApiResponse(responseCode = "404", description = "Venda não encontrada")
     @ApiResponse(responseCode = "409", description = "Não foi possível estornar o estoque da venda")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+    public ResponseEntity<Void> deletar(@Parameter(description = "Identificador da venda") @PathVariable Long id) {
         vendaService.deletar(id);
         return ResponseEntity.noContent().build();
     }

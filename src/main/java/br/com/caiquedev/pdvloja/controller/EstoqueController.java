@@ -4,6 +4,7 @@ import br.com.caiquedev.pdvloja.assembler.EstoqueModelAssembler;
 import br.com.caiquedev.pdvloja.entity.Estoque;
 import br.com.caiquedev.pdvloja.service.EstoqueService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -47,7 +48,7 @@ public class EstoqueController {
     @ApiResponse(responseCode = "200", description = "Estoque encontrado")
     @ApiResponse(responseCode = "404", description = "Estoque não encontrado")
     @GetMapping("/{id}")
-    public EntityModel<Estoque> listarPorId(@PathVariable Long id) {
+    public EntityModel<Estoque> listarPorId(@Parameter(description = "Identificador do estoque") @PathVariable Long id) {
         return assembler.toModel(estoqueService.listarPorId(id));
     }
 
@@ -55,7 +56,7 @@ public class EstoqueController {
     @ApiResponse(responseCode = "200", description = "Estoque encontrado")
     @ApiResponse(responseCode = "404", description = "Produto sem estoque cadastrado")
     @GetMapping("/produto/{produtoId}")
-    public EntityModel<Estoque> listarPorProduto(@PathVariable Long produtoId) {
+    public EntityModel<Estoque> listarPorProduto(@Parameter(description = "Identificador do produto associado") @PathVariable Long produtoId) {
         return assembler.toModel(estoqueService.listarPorProduto(produtoId));
     }
 
@@ -85,7 +86,7 @@ public class EstoqueController {
     @ApiResponse(responseCode = "400", description = "Dados inválidos")
     @ApiResponse(responseCode = "409", description = "Produto já possui estoque cadastrado")
     @PutMapping("/{id}")
-    public EntityModel<Estoque> atualizar(@PathVariable Long id, @RequestBody @Valid Estoque estoque) {
+    public EntityModel<Estoque> atualizar(@Parameter(description = "Identificador do estoque") @PathVariable Long id, @RequestBody @Valid Estoque estoque) {
         return assembler.toModel(estoqueService.atualizar(id, estoque));
     }
 
@@ -93,7 +94,7 @@ public class EstoqueController {
     @ApiResponse(responseCode = "204", description = "Estoque excluído com sucesso")
     @ApiResponse(responseCode = "404", description = "Estoque não encontrado")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+    public ResponseEntity<Void> deletar(@Parameter(description = "Identificador do estoque") @PathVariable Long id) {
         estoqueService.deletar(id);
         return ResponseEntity.noContent().build();
     }

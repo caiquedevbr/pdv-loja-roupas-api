@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
+@Schema(name = "Venda", description = "Dados de uma venda e seus produtos distintos")
 public class Venda {
 
     @Id

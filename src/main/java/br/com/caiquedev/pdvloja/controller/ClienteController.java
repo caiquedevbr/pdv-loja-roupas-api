@@ -4,6 +4,7 @@ import br.com.caiquedev.pdvloja.assembler.ClienteModelAssembler;
 import br.com.caiquedev.pdvloja.entity.Cliente;
 import br.com.caiquedev.pdvloja.service.ClienteService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -47,7 +48,7 @@ public class ClienteController {
     @ApiResponse(responseCode = "200", description = "Cliente encontrado")
     @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
     @GetMapping("/{id}")
-    public EntityModel<Cliente> listarPorId(@PathVariable Long id) {
+    public EntityModel<Cliente> listarPorId(@Parameter(description = "Identificador do cliente") @PathVariable Long id) {
         return assembler.toModel(clienteService.listarPorId(id));
     }
 
@@ -55,7 +56,7 @@ public class ClienteController {
     @ApiResponse(responseCode = "200", description = "Cliente encontrado")
     @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
     @GetMapping("/cpf/{cpf}")
-    public EntityModel<Cliente> listarPorCpf(@PathVariable String cpf) {
+    public EntityModel<Cliente> listarPorCpf(@Parameter(description = "CPF com 11 digitos, sem mascara") @PathVariable String cpf) {
         return assembler.toModel(clienteService.listarPorCpf(cpf));
     }
 
@@ -75,7 +76,7 @@ public class ClienteController {
     @ApiResponse(responseCode = "400", description = "Dados inválidos")
     @ApiResponse(responseCode = "409", description = "CPF já cadastrado")
     @PutMapping("/{id}")
-    public EntityModel<Cliente> atualizar(@PathVariable Long id, @RequestBody @Valid Cliente cliente) {
+    public EntityModel<Cliente> atualizar(@Parameter(description = "Identificador do cliente") @PathVariable Long id, @RequestBody @Valid Cliente cliente) {
         return assembler.toModel(clienteService.atualizar(id, cliente));
     }
 
@@ -84,7 +85,7 @@ public class ClienteController {
     @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
     @ApiResponse(responseCode = "409", description = "Cliente possui vendas vinculadas")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+    public ResponseEntity<Void> deletar(@Parameter(description = "Identificador do cliente") @PathVariable Long id) {
         clienteService.deletar(id);
         return ResponseEntity.noContent().build();
     }
