@@ -1,5 +1,6 @@
 package br.com.caiquedev.pdvloja.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -8,6 +9,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Schema(name = "Cliente", description = "Dados de identificacao e contato de um cliente")
@@ -44,6 +48,10 @@ public class Cliente {
     @Column(nullable = false, unique = true, length = 11)
     @Schema(description = "CPF com 11 dígitos, sem máscara", example = "12345678901")
     private String cpf;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "cliente")
+    private Set<Venda> vendas = new LinkedHashSet<>();
 
     public enum Genero { MASCULINO, FEMININO, OUTRO }
 

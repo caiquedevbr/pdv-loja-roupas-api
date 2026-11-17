@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/clientes")
+@RequestMapping({"/api/clientes", "/api/v1/clientes", "/api/v2/clientes"})
 @Tag(name = "Clientes", description = "Gerenciamento de clientes")
 public class ClienteController {
 
