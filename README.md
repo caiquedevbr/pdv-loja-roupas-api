@@ -1,11 +1,13 @@
 # VESTIPDV - API RESTFUL em Java com Spring Boot
 
-API REST para lojas de roupas. O sistema mantém clientes, categorias, produtos, estoque e vendas; calcula o valor da venda no servidor e movimenta o estoque de forma transacional.
+- API REST para lojas de roupas. O sistema mantém clientes, categorias, produtos, estoque e vendas; calcula o valor da venda no servidor e movimenta o estoque de forma transacional.
 
-![Logo vestipdv em fundo marinho.png](../../../Downloads/Logo%20vestipdv%20em%20fundo%20marinho.png)
+<div align="center">
+  <img src="src/main/java/br/com/caiquedev/pdvloja/assets/Logo%20vestipdv%20em%20fundo%20marinho.png" alt="Logo VestiPDV" width="450">
+</div>
 
 - **Status:** Concluído - Part I ✅
-- **Status:** Andamento - Part II ✅
+- **Status:** Em andamento - Part II 🚧
 
 ## Tecnologias
 

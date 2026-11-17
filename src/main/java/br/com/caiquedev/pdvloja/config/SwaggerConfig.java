@@ -22,11 +22,15 @@ import java.util.Set;
 @Configuration
 public class SwaggerConfig {
 
+    private static final String TERMOS_DE_USO_V1 = "/api/termos-de-uso";
+    private static final String TERMOS_DE_USO_V2 = "/api/v2/termos-de-uso";
+
     @Bean
     public OpenAPI customAPI() {
         return new OpenAPI().info(new Info()
                 .title("Ponto de Vendas (PDV) API")
                 .version("2.0.0")
+                .termsOfService(TERMOS_DE_USO_V1)
                 .description(documentacaoGeral())
                 .license(new License().name("MIT").url("https://mit-license.org/"))
                 .contact(new Contact().name("José Caique")
@@ -44,6 +48,7 @@ public class SwaggerConfig {
                 .addOpenApiCustomizer(openApi -> {
                     aplicarErros(openApi);
                     openApi.getInfo().setDescription(documentacaoV1());
+                    openApi.getInfo().setTermsOfService(TERMOS_DE_USO_V1);
                 })
                 .build();
     }
@@ -61,6 +66,7 @@ public class SwaggerConfig {
     private void configurarV2(OpenAPI openApi) {
         aplicarErros(openApi);
         openApi.getInfo().setDescription(documentacaoV2());
+        openApi.getInfo().setTermsOfService(TERMOS_DE_USO_V2);
         openApi.getComponents().addSecuritySchemes("apiKeyAuth", new io.swagger.v3.oas.models.security.SecurityScheme()
                 .type(io.swagger.v3.oas.models.security.SecurityScheme.Type.APIKEY)
                 .in(io.swagger.v3.oas.models.security.SecurityScheme.In.HEADER)
@@ -74,6 +80,9 @@ public class SwaggerConfig {
 
         openApi.getPaths().forEach((path, pathItem) -> pathItem.readOperationsMap()
                 .forEach((method, operation) -> {
+                    if ("/api/v2/termos-de-uso".equals(path)) {
+                        return;
+                    }
                     operation.addParametersItem(cabecalhoVersao());
                     if ("/api/v2/vendas".equals(path)
                             && method == io.swagger.v3.oas.models.PathItem.HttpMethod.POST) {

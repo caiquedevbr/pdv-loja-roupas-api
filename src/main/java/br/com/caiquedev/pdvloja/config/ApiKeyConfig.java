@@ -29,8 +29,17 @@ public class ApiKeyConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(apiVersionInterceptor).addPathPatterns("/api/v2/**").order(0);
-        registry.addInterceptor(interceptor).addPathPatterns("/api/v2/**").order(1);
-        registry.addInterceptor(rateLimitInterceptor).addPathPatterns("/api/v2/**").order(2);
+        registry.addInterceptor(apiVersionInterceptor)
+                .addPathPatterns("/api/v2/**")
+                .excludePathPatterns("/api/v2/termos-de-uso")
+                .order(0);
+        registry.addInterceptor(interceptor)
+                .addPathPatterns("/api/v2/**")
+                .excludePathPatterns("/api/v2/termos-de-uso")
+                .order(1);
+        registry.addInterceptor(rateLimitInterceptor)
+                .addPathPatterns("/api/v2/**")
+                .excludePathPatterns("/api/v2/termos-de-uso")
+                .order(2);
     }
 }
