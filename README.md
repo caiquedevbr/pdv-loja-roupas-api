@@ -1,6 +1,6 @@
-# Vesti PDV API
+# VESTIPDV - API RESTFUL em Java com Spring Boot
 
-API REST para uma loja de roupas. O sistema mantém clientes, categorias, produtos, estoque e vendas; calcula o valor da venda no servidor e movimenta o estoque de forma transacional.
+API REST para lojas de roupas. O sistema mantém clientes, categorias, produtos, estoque e vendas; calcula o valor da venda no servidor e movimenta o estoque de forma transacional.
 
 ## Tecnologias
 
