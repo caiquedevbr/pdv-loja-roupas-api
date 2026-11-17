@@ -2,6 +2,11 @@
 
 API REST para lojas de roupas. O sistema mantém clientes, categorias, produtos, estoque e vendas; calcula o valor da venda no servidor e movimenta o estoque de forma transacional.
 
+![Logo vestipdv em fundo marinho.png](../../../Downloads/Logo%20vestipdv%20em%20fundo%20marinho.png)
+
+- **Status:** Concluído - Part I ✅
+- **Status:** Andamento - Part II ✅
+
 ## Tecnologias
 
 - Java 17 e Spring Boot 4.1.1
@@ -10,16 +15,66 @@ API REST para lojas de roupas. O sistema mantém clientes, categorias, produtos,
 - Jakarta Bean Validation e BCrypt para senhas
 - Maven Wrapper
 
-## Modelo de dados e regras
 
-Há cinco entidades de negócio principais: `Cliente`, `Categoria`, `Produto`, `Estoque` e `Venda`.
+## Diagrama Entidade-Relacionamento (DER)
 
-| Relação | Uso no domínio |
-| --- | --- |
-| Cliente 1:N Venda | Um cliente pode realizar várias vendas. |
-| Categoria 1:N Produto | Produtos pertencem a uma categoria. |
-| Produto 1:1 Estoque | Cada produto possui, no máximo, um saldo de estoque. |
-| Venda N:N Produto | Uma venda contém produtos distintos; cada produto representa uma unidade. |
+A API **VestiPDV** possui cinco entidades principais: `Cliente`, `Categoria`, `Produto`, `Estoque` e `Venda`.
+
+### Modelo de Dados
+
+```mermaid
+erDiagram
+    CLIENTE ||--o{ VENDA : realiza
+    CATEGORIA ||--o{ PRODUTO : possui
+    PRODUTO ||--o| ESTOQUE : possui
+    VENDA }o--o{ PRODUTO : contem
+
+    CLIENTE {
+        Long id PK
+        String nome
+    }
+
+    CATEGORIA {
+        Long id PK
+        String nome
+    }
+
+    PRODUTO {
+        Long id PK
+        Long categoria_id FK
+        String nome
+    }
+
+    ESTOQUE {
+        Long id PK
+        Long produto_id FK
+        Integer quantidade
+    }
+
+    VENDA {
+        Long id PK
+        Long cliente_id FK
+        LocalDateTime data
+    }
+```
+
+### Relacionamentos
+
+| Relação | Cardinalidade | Descrição |
+|---------|---------------|-----------|
+| Cliente → Venda | 1:N | Um cliente pode realizar várias vendas. |
+| Categoria → Produto | 1:N | Uma categoria pode possuir vários produtos. |
+| Produto → Estoque | 1:0..1 | Cada produto possui, no máximo, um registro de estoque. |
+| Venda ↔ Produto | N:N | Uma venda pode conter vários produtos e um produto pode participar de várias vendas. |
+
+### Regras de Negócio
+
+- Cada venda está associada a um cliente.
+- Cada produto pertence a uma categoria.
+- Cada produto possui, no máximo, um saldo de estoque.
+- Uma venda pode conter diferentes produtos.
+- Cada produto representa uma unidade na venda.
+- O relacionamento entre venda e produto não permite duplicidade do mesmo produto na mesma venda.
 
 `Cliente.Genero`, `Produto.Tamanho` e `Venda.FormaPagamento` são enums persistidos como texto. As entradas passam por Bean Validation. As exclusões que violam referências recebem `409 Conflict`; uma venda devolve o estoque ao ser excluída.
 
