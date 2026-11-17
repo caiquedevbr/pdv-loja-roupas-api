@@ -1,321 +1,165 @@
-# Ponto de Vendas (PDV) API em Spring Boot
+# PDV Loja API
 
-O PDV (Ponto de Vendas) é uma API REST desenvolvida em Spring Boot para gerenciamento de uma loja
-de roupas. O sistema permite cadastrar clientes, organizar produtos por categorias, controlar o
-estoque e registrar vendas com múltiplos produtos.
+API REST para uma loja de roupas. O sistema mantém clientes, categorias, produtos, estoque e vendas; calcula o valor da venda no servidor e movimenta o estoque de forma transacional.
 
-![](blob:https://chatgpt.com/79a00afb-8c7d-4f8b-8ccb-a1b2033ff6f0)
+## Tecnologias
 
+- Java 17 e Spring Boot 4.1.1
+- Spring Web MVC, Spring Data JPA e H2
+- Spring HATEOAS e Springdoc OpenAPI
+- Jakarta Bean Validation e BCrypt para senhas
+- Maven Wrapper
 
-## Funcionalidades
+## Modelo de dados e regras
 
-* Gestão de Produtos: Cadastro, consulta, atualização e controle de estoque
-* Gestão de Vendas: Criação de vendas com múltiplos itens
-* Controle de Estoque: Registrar vendas com múltiplos produtos
+Há cinco entidades de negócio principais: `Cliente`, `Categoria`, `Produto`, `Estoque` e `Venda`.
 
----
+| Relação | Uso no domínio |
+| --- | --- |
+| Cliente 1:N Venda | Um cliente pode realizar várias vendas. |
+| Categoria 1:N Produto | Produtos pertencem a uma categoria. |
+| Produto 1:1 Estoque | Cada produto possui, no máximo, um saldo de estoque. |
+| Venda N:N Produto | Uma venda contém produtos distintos; cada produto representa uma unidade. |
 
-### Core
-* Java 17 - Linguagem de programação
-* Spring Boot 4.1.1 - Framework principal
-* Spring Data JPA - Persistência de dados
-* Spring Web - Criação de aplicações web RESTful
-* Bean Validation - Validação de dados
-___
-## Pré-requisitos
-* Java 17 instalado
-* Maven instalado (ou use o wrapper do projeto)
+`Cliente.Genero`, `Produto.Tamanho` e `Venda.FormaPagamento` são enums persistidos como texto. As entradas passam por Bean Validation. As exclusões que violam referências recebem `409 Conflict`; uma venda devolve o estoque ao ser excluída.
 
-## Banco de Dados
-* H2 Database - Banco em memória para desenvolvimento
+> O modelo atual registra produtos distintos por venda. Para vender várias unidades do mesmo produto, o próximo passo de domínio seria uma entidade `ItemVenda` com quantidade — não enviar o mesmo produto repetido no JSON.
 
-## Ferramentas
-* Apache Maven - Gerenciamento de dependências e build
-* intelliJ IDEA - IDE recomendada
-* Swagger
-___
+## Executar localmente
 
-## Modelagem do Banco de Dados
+Pré-requisitos: JDK 17. O projeto traz o Maven Wrapper, portanto Maven global não é necessário.
 
-O diagrama abaixo representa a estrutura de dados da API, incluindo os relacionamentos **One-to-One**, **One-to-Many** e **Many-to-Many**.
-
-```mermaid
-erDiagram
-
-    CLIENTE {
-        Long id PK
-        String nome
-        Integer idade
-        Genero genero
-        String telefone
-        String cpf UK
-    }
-
-    CATEGORIA {
-        Long id PK
-        String nome UK
-        String descricao
-    }
-
-    PRODUTO {
-        Long id PK
-        String nome
-        String descricao
-        BigDecimal preco
-        Tamanho tamanho
-        Long categoria_id FK
-    }
-
-    ESTOQUE {
-        Long id PK
-        Integer quantidade
-        Integer estoque_minimo
-        Long produto_id FK
-    }
-
-    VENDA {
-        Long id PK
-        LocalDateTime data_venda
-        FormaPagamento forma_pagamento
-        BigDecimal valor_total
-        Long cliente_id FK
-    }
-
-    CLIENTE ||--o{ VENDA : realiza
-    CATEGORIA ||--o{ PRODUTO : possui
-    PRODUTO ||--|| ESTOQUE : possui
-    VENDA }o--o{ PRODUTO : possui
-```
-## Relacionamentos
-
-| Entidades | Tipo | Descrição |
-|---|---|---|
-| `Cliente → Venda` | One-to-Many | Um cliente pode realizar várias vendas |
-| `Categoria → Produto` | One-to-Many | Uma categoria pode possuir vários produtos |
-| `Produto ↔ Estoque` | One-to-One | Cada produto possui um único estoque |
-| `Venda ↔ Produto` | Many-to-Many | Uma venda pode possuir vários produtos e um produto pode participar de várias vendas |
-
-## Legenda
-
-| Sigla | Significado |
-|---|---|
-| `PK` | Primary Key |
-| `FK` | Foreign Key |
-| `UK` | Unique Key |
-| `NOT NULL` | Campo obrigatório |
-| `UNIQUE` | Valor único no banco |
-
-## Endpoints da API
-
-A API disponibiliza endpoints REST para gerenciamento de **Clientes, Categorias, Produtos, Estoques e Vendas**.
-
-Todas as rotas que retornam coleções utilizam paginação através do `Pageable` do Spring Data.
-
-Exemplo de paginação:
-
-```http
-GET /api/produtos?page=0&size=10&sort=nome,asc
+```powershell
+$env:MAVEN_OPTS='-Duser.home=C:\Users\jcaiq'
+.\mvnw.cmd spring-boot:run
 ```
 
----
+O banco H2 é em memória (`jdbc:h2:mem:testdb`) e criado/atualizado automaticamente. O console H2 está habilitado pela aplicação. Para executar os testes:
 
-## Cliente
-
-**Base URL:** `/api/clientes`
-
-| Método | Endpoint | Descrição | Status |
-|---|---|---|---|
-| `POST` | `/api/clientes` | Cadastrar um novo cliente | `201 Created` |
-| `GET` | `/api/clientes` | Listar clientes com paginação | `200 OK` |
-| `GET` | `/api/clientes/{id}` | Buscar cliente por ID | `200 OK` |
-| `PUT` | `/api/clientes/{id}` | Atualizar um cliente | `200 OK` |
-| `DELETE` | `/api/clientes/{id}` | Excluir um cliente | `204 No Content` |
-| `GET` | `/api/clientes/cpf/{cpf}` | Buscar cliente pelo CPF | `200 OK` |
-
-### Consulta personalizada
-
-Busca um cliente através do CPF.
-
-```http
-GET /api/clientes/cpf/12345678900
+```powershell
+$env:MAVEN_OPTS='-Duser.home=C:\Users\jcaiq'
+.\mvnw.cmd '-Dmaven.repo.local=C:\Users\jcaiq\.m2\repository' test
 ```
 
----
+## Swagger/OpenAPI
 
-## Categoria
+Com a aplicação em execução, abra [Swagger UI](http://localhost:8080/swagger-ui/index.html).
 
-**Base URL:** `/api/categorias`
+- V1: `http://localhost:8080/v3/api-docs/v1`
+- V2: `http://localhost:8080/v3/api-docs/v2`
 
-| Método | Endpoint | Descrição | Status |
-|---|---|---|---|
-| `POST` | `/api/categorias` | Cadastrar uma nova categoria | `201 Created` |
-| `GET` | `/api/categorias` | Listar categorias com paginação | `200 OK` |
-| `GET` | `/api/categorias/{id}` | Buscar categoria por ID | `200 OK` |
-| `PUT` | `/api/categorias/{id}` | Atualizar uma categoria | `200 OK` |
-| `DELETE` | `/api/categorias/{id}` | Excluir uma categoria | `204 No Content` |
-| `GET` | `/api/categorias/busca?nome={nome}` | Buscar categorias pelo nome | `200 OK` |
-
-### Consulta personalizada
-
-Busca categorias pelo nome.
-
-```http
-GET /api/categorias/busca?nome=camiseta&page=0&size=10
-```
-
----
-
-## Produto
-
-**Base URL:** `/api/produtos`
-
-| Método | Endpoint | Descrição | Status |
-|---|---|---|---|
-| `POST` | `/api/produtos` | Cadastrar um novo produto | `201 Created` |
-| `GET` | `/api/produtos` | Listar produtos com paginação | `200 OK` |
-| `GET` | `/api/produtos/{id}` | Buscar produto por ID | `200 OK` |
-| `PUT` | `/api/produtos/{id}` | Atualizar um produto | `200 OK` |
-| `DELETE` | `/api/produtos/{id}` | Excluir um produto | `204 No Content` |
-| `GET` | `/api/produtos/busca?nome={nome}` | Buscar produtos pelo nome | `200 OK` |
-
-### Consulta personalizada
-
-Busca produtos que contenham determinado nome.
-
-```http
-GET /api/produtos/busca?nome=camiseta&page=0&size=10
-```
-
----
-
-## Estoque
-
-**Base URL:** `/api/estoques`
-
-| Método | Endpoint | Descrição | Status |
-|---|---|---|---|
-| `POST` | `/api/estoques` | Cadastrar um registro de estoque | `201 Created` |
-| `GET` | `/api/estoques` | Listar estoques com paginação | `200 OK` |
-| `GET` | `/api/estoques/{id}` | Buscar estoque por ID | `200 OK` |
-| `PUT` | `/api/estoques/{id}` | Atualizar um estoque | `200 OK` |
-| `DELETE` | `/api/estoques/{id}` | Excluir um estoque | `204 No Content` |
-| `GET` | `/api/estoques/baixo` | Listar produtos com estoque baixo | `200 OK` |
-
-### Consulta personalizada
-
-Retorna os registros cuja quantidade disponível seja menor ou igual ao estoque mínimo.
-
-```http
-GET /api/estoques/baixo?page=0&size=10
-```
-
-Exemplo:
+O seletor de grupos da interface permite alternar entre V1 e V2. Cada listagem aceita `page`, `size` (máximo 100) e `sort`, por exemplo:
 
 ```text
-quantidade = 3
-estoque_minimo = 5
-
-3 <= 5 → estoque baixo
-```
-
----
-
-## Venda
-
-**Base URL:** `/api/vendas`
-
-| Método | Endpoint | Descrição | Status |
-|---|---|---|---|
-| `POST` | `/api/vendas` | Registrar uma nova venda | `201 Created` |
-| `GET` | `/api/vendas` | Listar vendas com paginação | `200 OK` |
-| `GET` | `/api/vendas/{id}` | Buscar venda por ID | `200 OK` |
-| `PUT` | `/api/vendas/{id}` | Atualizar uma venda | `200 OK` |
-| `DELETE` | `/api/vendas/{id}` | Excluir uma venda | `204 No Content` |
-| `GET` | `/api/vendas/cliente/{clienteId}` | Listar vendas realizadas por um cliente | `200 OK` |
-
-### Consulta personalizada
-
-Retorna todas as vendas realizadas por determinado cliente.
-
-```http
-GET /api/vendas/cliente/1?page=0&size=10
-```
-
----
-
-## Paginação
-
-Todas as rotas que retornam listas utilizam paginação.
-
-### Parâmetros
-
-| Parâmetro | Descrição | Exemplo |
-|---|---|---|
-| `page` | Número da página | `0` |
-| `size` | Quantidade de registros | `10` |
-| `sort` | Campo e direção da ordenação | `nome,asc` |
-
-### Exemplo
-
-```http
 GET /api/produtos?page=0&size=10&sort=nome,asc
 ```
 
----
+As respostas de recursos incluem `_links` HATEOAS, como `self`, `update`, `delete` e links para recursos relacionados.
 
-## 🔗 HATEOAS
+## Versionamento
 
-As respostas da API incluem links para navegação entre os recursos relacionados.
+| Versão | Base | Cabeçalhos | Finalidade |
+| --- | --- | --- | --- |
+| V1 | `/api/**` | Nenhum obrigatório | Contrato legado preservado. |
+| V2 | `/api/v2/**` | `X-API-Version: 2` | Contrato com API Key, rate limit e venda idempotente. |
 
-Exemplo de resposta:
+Uma chamada à V2 sem `X-API-Version: 2` recebe `400 Bad Request`. A V1 não passa pela autenticação ou pelos limites da V2.
 
-```json
-{
-  "id": 1,
-  "nome": "Camiseta Oversized",
-  "descricao": "Camiseta preta",
-  "preco": 89.90,
-  "tamanho": "M",
-  "_links": {
-    "self": {
-      "href": "/api/produtos/1"
-    },
-    "update": {
-      "href": "/api/produtos/1"
-    },
-    "delete": {
-      "href": "/api/produtos/1"
-    },
-    "estoque": {
-      "href": "/api/estoques/produto/1"
-    }
-  }
-}
+## V2: autenticação por API Key
+
+No perfil local `dev`, a aplicação cria o usuário de demonstração `operador@pdv.com` com a senha `SenhaSegura123`. Isso serve somente ao desenvolvimento; em produção, use um perfil próprio e usuários reais com senhas BCrypt.
+
+Faça login para emitir uma chave. A chave original é devolvida apenas nessa resposta, enquanto o banco armazena somente seu SHA-256.
+
+```bash
+curl -X POST http://localhost:8080/api/v2/auth/login \
+  -H "Content-Type: application/json" \
+  -H "X-API-Version: 2" \
+  -d '{"email":"operador@pdv.com","senha":"SenhaSegura123"}'
 ```
 
----
+Use o valor retornado em `apiKey` no botão **Authorize** do Swagger ou no header `X-API-Key`. Todos os endpoints V2, exceto o login, exigem a chave. Por padrão, a chave expira 24 horas após a emissão (`app.api-key.ttl-hours=24`).
 
-## Códigos HTTP
+```bash
+curl http://localhost:8080/api/v2/produtos \
+  -H "X-API-Version: 2" \
+  -H "X-API-Key: SUA_API_KEY"
+```
 
-| Código | Significado | Utilização |
-|---|---|---|
-| `200 OK` | Requisição realizada com sucesso | GET e PUT |
-| `201 Created` | Recurso criado | POST |
-| `204 No Content` | Operação concluída sem conteúdo | DELETE |
-| `400 Bad Request` | Dados inválidos | Erros de validação |
-| `404 Not Found` | Recurso não encontrado | ID inexistente |
-| `409 Conflict` | Conflito de dados | CPF ou outro campo único duplicado |
+Revogue a própria chave com:
 
----
+```bash
+curl -X POST http://localhost:8080/api/v2/auth/logout \
+  -H "X-API-Version: 2" \
+  -H "X-API-Key: SUA_API_KEY"
+```
 
-## Resumo
+## V2: venda idempotente
 
-| Entidade | CRUD | Consulta personalizada | Paginação |
-|---|---|---|---|
-| Cliente | ✅ | Buscar por CPF | ✅ |
-| Categoria | ✅ | Buscar por nome | ✅ |
-| Produto | ✅ | Buscar por nome | ✅ |
-| Estoque | ✅ | Buscar estoque baixo | ✅ |
-| Venda | ✅ | Buscar vendas por cliente | ✅ |
+`POST /api/v2/vendas` exige `X-Idempotency-Key`. Use uma chave nova por intenção de venda, normalmente um UUID. A chave é associada ao usuário, à operação e a um fingerprint do corpo.
 
-**Total: 30 endpoints REST**
+- Primeiro envio: cria a venda, baixa o estoque e responde `201`.
+- Mesmo corpo e mesma chave: responde a resposta original com `Idempotent-Replayed: true`, sem uma nova baixa.
+- Corpo diferente com a mesma chave: responde `409 Conflict`.
+- Os registros de idempotência expiram em 24 horas por padrão (`app.idempotency.ttl-hours`).
+
+Crie primeiro uma categoria, cliente, produto e estoque; então registre a venda:
+
+```bash
+curl -X POST http://localhost:8080/api/v2/vendas \
+  -H "Content-Type: application/json" \
+  -H "X-API-Version: 2" \
+  -H "X-API-Key: SUA_API_KEY" \
+  -H "X-Idempotency-Key: 1d8821c9-9b52-4c58-b714-bfa0c7a71dbd" \
+  -d '{"formaPagamento":"PIX","cliente":{"id":1},"produtos":[{"id":1}]}'
+```
+
+## V2: rate limiting e CORS
+
+O limite padrão é 60 requisições por minuto, por usuário autenticado (por IP no login). Ele é configurado em `application.properties`:
+
+```properties
+app.rate-limit.requests-per-minute=60
+app.cors.allowed-origins=http://localhost:5173,http://localhost:3000
+```
+
+As respostas V2 expõem:
+
+- `X-RateLimit-Limit`: máximo da janela
+- `X-RateLimit-Remaining`: saldo de requisições
+- `X-RateLimit-Reset`: timestamp Unix da próxima janela
+- `Retry-After`: segundos até poder tentar novamente
+
+Ao atingir o limite, a API retorna `429 Too Many Requests`. Os contadores são persistidos no banco; para um limite global estrito com múltiplas instâncias, configure banco compartilhado e coordenação distribuída adicional.
+
+O CORS aceita apenas as origens configuradas por `app.cors.allowed-origins`, suporta preflight `OPTIONS` e permite `X-API-Version`, `X-API-Key` e `X-Idempotency-Key`. Ajuste a propriedade para as origens reais antes de publicar a API.
+
+## Recursos REST
+
+As rotas de cada versão cobrem criação, listagem paginada, consulta por ID, atualização e exclusão quando a integridade permite.
+
+| Recurso | Consulta especializada |
+| --- | --- |
+| Clientes | `GET /api/clientes/cpf/{cpf}` |
+| Categorias | `GET /api/categorias/busca?nome=...` |
+| Produtos | `GET /api/produtos/busca?nome=...` |
+| Estoques | `GET /api/estoques/baixo` e `GET /api/estoques/produto/{produtoId}` |
+| Vendas | `GET /api/vendas/cliente/{clienteId}` |
+
+Troque a base `/api` por `/api/v2` e envie os headers V2 para usar os recursos avançados.
+
+## Respostas de erro
+
+Erros usam `application/problem+json` com `status`, `title`, `detail`/`mensagem`, `timestamp` e `detalhes` de validação quando cabível.
+
+| Status | Significado |
+| --- | --- |
+| 200 | Consulta ou atualização concluída. |
+| 201 | Recurso criado. |
+| 204 | Exclusão ou logout concluído. |
+| 400 | Corpo, parâmetros ou versão inválidos. |
+| 401 | API Key ausente, inválida ou revogada. |
+| 404 | Recurso inexistente. |
+| 409 | Integridade, estoque ou chave idempotente em conflito. |
+| 429 | Limite de requisições excedido. |
+| 500 | Falha interna sem detalhes sensíveis. |
